@@ -1,12 +1,27 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+// import GithubCorner from 'react-github-corner'
+import {GlobalStyle} from '~/components'
+import {BrowserRouter, Switch, Route} from 'react-router-dom'
+import {Landing, Boards, Board, FourOFour} from '~/pages'
+import {render} from 'react-dom'
+import {unregisterServiceWorker} from '~/utilities'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const App = () => {
+  return (
+    <>
+      <GlobalStyle />
+      <div>
+        <BrowserRouter>
+          <Switch>
+            <Route exact={true} path="/" component={Landing} />
+            <Route path="/boards" component={Boards} />
+            <Route path="/board/:id" component={Board} />
+            <Route component={FourOFour} />
+          </Switch>
+        </BrowserRouter>
+      </div>
+    </>
+  )
+}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+render(<App />, document.getElementById('root'))
+unregisterServiceWorker()
