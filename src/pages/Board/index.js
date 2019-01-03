@@ -4,6 +4,7 @@ import {useState, useEffect} from 'react'
 import {getFile, putFile} from 'blockstack'
 import styled from 'styled-components'
 import {IoIosCloseCircle} from 'react-icons/io'
+import {Redirect} from 'react-router-dom'
 
 const ActionBar = styled.div`
   position: absolute;
@@ -38,6 +39,8 @@ const DeleteButton = styled.div`
 
 export default props => {
   const [state, setState] = useState({})
+  const [exists, setExists] = useState(true)
+  const [deleted, setDeleted] = useState(false)
   const boardId = props.match.params.id
 
   useEffect(() => {
@@ -45,7 +48,7 @@ export default props => {
       if (file) {
         setState(JSON.parse(file))
       } else {
-        window.location.href = `${window.location.origin}/404`
+        setExists(false)
       }
     })
     return () => {
@@ -53,7 +56,11 @@ export default props => {
     }
   }, [])
 
-  return state.lanes ? (
+  return !exists ? (
+    <Redirect to="/404" />
+  ) : deleted ? (
+    <Redirect to="/" />
+  ) : state.lanes ? (
     <>
       <Board
         draggable
@@ -89,7 +96,7 @@ export default props => {
                   )
                   putFile('BLAPPY_BOARDS.json', JSON.stringify(filtered)).then(
                     () => {
-                      window.location.href = `${window.location.origin}`
+                      setDeleted(true)
                     },
                   )
                 })

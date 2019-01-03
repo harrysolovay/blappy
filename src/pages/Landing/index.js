@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import {withAuth} from '~/utilities'
 import {useEffect, useState} from 'react'
 import {Loading} from '~/components'
+import {Redirect} from 'react-router-dom'
 
 const Container = styled.div`
   width: 100%;
@@ -35,7 +36,7 @@ const Welcome = styled.div`
   > div {
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 3px;
-    padding: 9px 13px;
+    padding: 9px 13px 9px 13px;
     cursor: pointer;
     &:hover {
       opacity: 0.875;
@@ -69,16 +70,20 @@ const logIn = () => {
 
 export default props => {
   const [loading, setLoading] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(false)
   useEffect(() => {
     withAuth(user => {
       if (user) {
-        window.location.href = `${window.location.origin}/boards`
+        setLoggedIn(true)
       } else {
         setLoading(false)
       }
     })
   }, [])
-  return loading ? (
+
+  return loggedIn ? (
+    <Redirect to="/boards" />
+  ) : loading ? (
     <Loading />
   ) : (
     <Container>
@@ -91,7 +96,7 @@ export default props => {
         <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://github.com/harrysolovay"
+          href="https://github.com/harrysolovay/blockstack-link-dapp"
           children={`check out this dapp's source code`}
         />
       </SourceLink>

@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import Masonry from 'react-masonry-component'
 // import data from '~/boards-data'
-import {Link} from 'react-router-dom'
+import {Link, Redirect} from 'react-router-dom'
 import {generate as createId} from 'shortid'
 import {getFile, putFile, signUserOut} from 'blockstack'
 import {Input, Textarea, Button} from '~/components'
@@ -122,14 +122,21 @@ export default props => {
   const [addingNewBoard, setAddingNewBoard] = useState(false)
   const [newBoardTitle, setNewBoardTitle] = useState('')
   const [newBoardDescription, setNewBoardDescription] = useState('')
+  const [clickedBoard, setClickedBoard] = useState(false)
 
   useEffect(() => {
     getFile('BLAPPY_BOARDS.json').then(data => {
-      setBoards(JSON.parse(data))
+      if (data) {
+        setBoards(JSON.parse(data))
+      } else {
+        setBoards([])
+      }
     })
   }, [])
 
-  return (
+  return clickedBoard ? (
+    <Redirect to={`/board/${clickedBoard}`} />
+  ) : (
     <>
       <Container>
         <Nav>
@@ -195,10 +202,8 @@ export default props => {
                         setNewBoardTitle('')
                         setNewBoardDescription('')
                         setAddingNewBoard(false)
-                        // put file for the board
-                        window.location.href = `${
-                          window.location.origin
-                        }/board/${newId}`
+
+                        setClickedBoard(newId)
                       })
                     }}
                   >
