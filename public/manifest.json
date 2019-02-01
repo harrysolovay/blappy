@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Blappy",
+  "name": "Blappy (the Blockstack-based Link-saving Dapp)",
   "icons": [
     {
       "src": "favicon.ico",
