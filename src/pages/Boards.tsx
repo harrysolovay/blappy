@@ -1,13 +1,12 @@
 import React, {useState, useEffect, FormEvent} from 'react'
 import styled from 'styled-components'
-import {asPage, Header, AddCardButton} from '../components'
+import {asPage, Header, AddCardButton, DeleteButton} from '../components'
 import {getCurrentUser} from '../utilities'
-import {boards as data} from '../data'
 import {IBoards, IBoard} from '../@types/storage'
 import {Link} from 'react-router-dom'
 import Masonry from 'react-masonry-component'
 import {generate as createId} from 'shortid'
-import {getFile, putFile} from 'blockstack'
+import {getFile, putFile, signUserOut, deleteFile} from 'blockstack'
 
 const Container = styled.div`
   margin: 0px auto;
@@ -31,6 +30,16 @@ const Container = styled.div`
     padding: 12px 14px 10px 14px;
     background-color: #fff;
     cursor: pointer;
+
+    .delete-button {
+      display: none;
+    }
+
+    &:hover {
+      .delete-button {
+        display: block;
+      }
+    }
 
     * {
       text-decoration: none;
@@ -125,6 +134,8 @@ export default asPage(({redirect}) => {
     boards && (
       <Container>
         <Header
+          leftText='log out'
+          leftOnClick={() => signUserOut('/')}
           centerInitialValue=''
           centerPlaceholder='search'
           centerOnChange={(value: string) => setSearchText(value)}
@@ -189,6 +200,21 @@ export default asPage(({redirect}) => {
                 ((board.title && board.title.match(exp)) ||
                   (board.description && board.description.match(exp))) && (
                   <div className='masonry-card' key={board.id}>
+                    <DeleteButton
+                      onClick={() => {
+                        getFile('BLAPPY_BOARDS.json').then(data => {
+                          const filtered = JSON.parse(data).filter(
+                            (b: IBoard) => b.id !== board.id,
+                          )
+                          putFile(
+                            'BLAPPY_BOARDS.json',
+                            JSON.stringify(filtered),
+                          ).then(() => {
+                            setBoards(filtered)
+                          })
+                        })
+                      }}
+                    />
                     <Link to={`board/${board.id}`}>
                       <div className='heading' children={board.title} />
                       <div

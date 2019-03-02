@@ -21,6 +21,10 @@ const OverflowVisibilityStyle = createGlobalStyle`
   }
   .smooth-dnd-draggable-wrapper {
     overflow: visible !important;
+
+    > article > div:nth-child(2) {
+      display: none;
+    }
   }
 `
 
@@ -65,7 +69,7 @@ export default ({key, id, laneId, removeCard, url}: Props) => {
     <>
       <OverflowVisibilityStyle />
       <Container>
-        <DeleteButton onClick={deleteCard} />
+        <DeleteButton onClick={deleteCard} top={'4px'} right={'-4px'} />
         <Link {...{key}} href={url} target='_blank' rel='noopener noreferrer'>
           {url && (
             <img

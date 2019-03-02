@@ -1,8 +1,9 @@
 import React, {useState, MouseEvent, FormEvent} from 'react'
 import styled from 'styled-components'
-import {signUserOut} from 'blockstack'
 
 interface Props {
+  leftText?: string
+  leftOnClick?: (e: MouseEvent<HTMLElement>) => void
   centerInitialValue: string
   centerPlaceholder: string
   centerOnChange: (newValue: string) => void
@@ -17,12 +18,18 @@ const Button = styled.button`
   cursor: pointer;
 `
 
-const TitleField = styled.input`
+const TitleField = styled.input<{left?: boolean}>`
   border: none;
   appearance: none;
   text-align: center;
   display: flex;
   flex: 1;
+  ${props =>
+    !props.left &&
+    `
+      text-align: left;
+      padding-left: 15px;
+    `}
 `
 
 const Header = styled.div`
@@ -42,6 +49,8 @@ const Header = styled.div`
 `
 
 export default ({
+  leftText,
+  leftOnClick,
   centerInitialValue,
   centerPlaceholder: placeholder,
   centerOnChange,
@@ -57,9 +66,19 @@ export default ({
 
   return (
     <Header>
-      <Button children='log out' onClick={() => signUserOut('/')} />
-      <TitleField onChange={updateValue} {...{value, placeholder}} />
-      <Button onClick={rightOnClick} children={rightText} />
+      {leftText && leftOnClick && (
+        <Button children={leftText} onClick={leftOnClick} />
+      )}
+      <TitleField
+        left={!!leftText}
+        onChange={updateValue}
+        {...{value, placeholder}}
+      />
+      <Button
+        onClick={rightOnClick}
+        children={rightText}
+        style={{color: '#4f79b0'}}
+      />
     </Header>
   )
 }

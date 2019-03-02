@@ -10,19 +10,19 @@
     "@types/react-dom": "16.0.11",
     "@types/react-hot-loader": "^4.1.0",
     "@types/react-router-dom": "^4.3.1",
-    "@types/styled-components": "^4.1.4",
+    "@types/styled-components": "4.1.4",
     "blockstack": "^18.2.0",
     "ramda": "^0.26.1",
-    "react": "^16.7.0-alpha.2",
-    "react-dom": "^16.7.0-alpha.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
     "react-hot-reload.macro": "^2.0.1",
     "react-icons": "^3.2.2",
     "react-masonry-component": "^6.2.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.3",
+    "react-scripts": "^2.1.5",
     "react-trello": "^2.1.0",
     "shortid": "^2.2.14",
-    "styled-components": "^4.1.3",
+    "styled-components": "4.0.3",
     "styled-normalize": "^8.0.4",
     "typescript": "3.2.2",
     "valid-url": "^1.0.9"
@@ -44,5 +44,8 @@
   "devDependencies": {
     "@rescripts/cli": "^0.0.10",
     "@types/shortid": "^0.0.29"
+  },
+  "resolutions": {
+    "styled-components": "4.0.3"
   }
 }

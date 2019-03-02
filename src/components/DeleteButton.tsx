@@ -10,7 +10,7 @@ interface Props {
 
 const StyledDeleteButton = styled.button<{top?: string; right?: string}>`
   position: absolute;
-  z-index: 10000;
+  z-index: 100000;
   top: ${props => (props.top ? props.top : '-7px')};
   right: ${props => (props.right ? props.right : '-12px')};
   border: none;

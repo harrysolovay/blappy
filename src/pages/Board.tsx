@@ -6,14 +6,12 @@ import {
   LaneHeader,
   AddCardButton,
   Header,
-  DeleteButton,
   NewLane,
 } from '../components'
 import {getCurrentUser} from '../utilities'
 import Board from 'react-trello'
-import {IBoard, ILane} from '../@types/storage'
-import {getFile, putFile, deleteFile} from 'blockstack'
-import {generate as createId} from 'shortid'
+import {IBoard} from '../@types/storage'
+import {getFile, putFile} from 'blockstack'
 import styled from 'styled-components'
 
 const DescriptionField = styled.textarea`
@@ -36,56 +34,22 @@ export default asPage(({match: {params: {id}}, redirect}) => {
   const [state, setState] = useState(null as IBoard | null)
   const [boardTitle, setBoardTitle] = useState<string>('')
   const [boardDescription, setBoardDescription] = useState<string>('')
-  let pending = new Date().getTime()
+  const [lastSaved, setLastSaved] = useState<{
+    title: string
+    description: string
+  }>({title: boardTitle, description: boardDescription})
 
-  const saveBoardTitle = (value: string) => {
-    console.log('triggered')
-
-    setBoardTitle(value)
-    const newBoard = {...state, title: value, edited: new Date()}
-
-    const currentTime = new Date().getTime()
-    pending = currentTime
-
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (currentTime === pending) {
-          putFile(`${id}.json`, JSON.stringify(newBoard))
-            .then(resolve)
-            .catch(reject)
-        }
-      }, 1000)
-    }).then(() =>
-      getFile(`${id}.json`).then(data => console.log(JSON.parse(data))),
-    )
-  }
-
-  const saveBoardDescription = (value: string) => {
-    setBoardDescription(value)
-    const newBoard = {...state, description: value, edited: new Date()}
-
-    const currentTime = new Date().getTime()
-    pending = currentTime
-
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (currentTime === pending) {
-          putFile(`${id}.json`, JSON.stringify(newBoard))
-            .then(resolve)
-            .catch(reject)
-        }
-      }, 1000)
-    }).then(() =>
-      getFile(`${id}.json`).then(data => console.log(JSON.parse(data))),
-    )
-  }
-
-  const deleteBoard = () => {
-    getFile('BLAPPY_BOARDS.json').then(data => {
-      const filtered = JSON.parse(data).filter((b: IBoard) => b.id !== id)
-      putFile('BLAPPY_BOARDS.json', JSON.stringify(filtered)).then(() => {
-        const {origin} = window.location
-        window.location.href = origin
+  const saveBoard = () => {
+    const newBoard = {
+      ...state,
+      title: boardTitle,
+      description: boardDescription,
+      edited: new Date(),
+    }
+    putFile(`${id}.json`, JSON.stringify(newBoard)).then(() => {
+      setLastSaved({
+        title: boardTitle,
+        description: boardDescription,
       })
     })
   }
@@ -98,10 +62,13 @@ export default asPage(({match: {params: {id}}, redirect}) => {
       getFile(`${id}.json`).then(data => {
         if (data) {
           const parsed = JSON.parse(data)
-          console.log(parsed)
-          setBoardTitle(parsed.title)
-          setBoardDescription(parsed.description)
+          setBoardTitle(parsed.title || '')
+          setBoardDescription(parsed.description || '')
           setState(parsed)
+          setLastSaved({
+            title: parsed.title || '',
+            description: parsed.description || '',
+          })
         } else {
           redirect('404')
         }
@@ -109,23 +76,30 @@ export default asPage(({match: {params: {id}}, redirect}) => {
     })()
   }, [])
 
+  console.log(lastSaved, boardTitle, boardDescription)
+
   return (
     state && (
       <>
         <Header
           centerInitialValue={boardTitle}
           centerPlaceholder='board name'
-          centerOnChange={saveBoardTitle}
+          centerOnChange={setBoardTitle}
           rightText={
-            <DeleteButton onClick={deleteBoard} top={'19px'} right={'11px'} />
+            !(
+              lastSaved.title === boardTitle &&
+              lastSaved.description === boardDescription
+            )
+              ? 'save changes'
+              : ''
           }
-          rightOnClick={() => {}}
+          rightOnClick={saveBoard}
         />
         <DescriptionField
           placeholder='description'
           onChange={({
             currentTarget: {value},
-          }: FormEvent<HTMLTextAreaElement>) => saveBoardDescription(value)}
+          }: FormEvent<HTMLTextAreaElement>) => setBoardDescription(value)}
           value={boardDescription}
         />
         <Board
